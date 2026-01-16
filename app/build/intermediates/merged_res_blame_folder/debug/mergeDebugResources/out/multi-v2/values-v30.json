@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "mad.ca.s10262480b.whackamole.app-mergeDebugResources-35:/values-v30/values-v30.xml",
+            "outputFile": "mad.ca.s10262480b.whackamole.app-mergeDebugResources-40:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.13\\transforms\\036b4734cbab24dde04fb3f62169b039\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\Admin\\.gradle\\caches\\8.13\\transforms\\06b21801ba7c80608a9af73e615f0384\\transformed\\material3\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

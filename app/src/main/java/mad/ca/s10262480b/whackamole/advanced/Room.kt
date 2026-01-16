@@ -1,8 +1,11 @@
 package mad.ca.s10262480b.whackamole.advanced
 
+
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -16,9 +19,14 @@ data class UserEntity(
 )
 
 
-@Entity(tableName = "scores")
+@Entity(tableName = "scores",
+    foreignKeys = [
+        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["userId"], onDelete = ForeignKey.CASCADE)],
+    indices = [
+        Index(value = ["userId"])
+    ])
 data class ScoreEntity(
-    @PrimaryKey(autoGenerate = true) val Id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val userId: Int,
     val score: Int,
     val timestamp: Long
@@ -62,7 +70,7 @@ data class LeaderboardEntry(
 )
 
 
-@Database(entities = [UserEntity::class, ScoreEntity::class], version = 1)
+@Database(entities = [UserEntity::class, ScoreEntity::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun scoreDao(): ScoreDao

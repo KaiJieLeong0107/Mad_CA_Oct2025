@@ -36,16 +36,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.core.content.edit
-import androidx.navigation.NavController
+import kotlinx.coroutines.withContext
+import mad.ca.s10262480b.whackamole.advanced.ScoreDao
+import mad.ca.s10262480b.whackamole.advanced.ScoreEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(navController: NavController){
+fun GameScreen(navController: NavController, scoreDao: ScoreDao, userId: Int){
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("game_prefs",Context.MODE_PRIVATE)
 
@@ -54,9 +57,20 @@ fun GameScreen(navController: NavController){
     var timeLeft by remember { mutableStateOf(30) }
     var moleIndex by remember { mutableStateOf(-1) }
     var isRunning by remember { mutableStateOf(false) }
-    var highscore by remember { mutableStateOf(prefs.getInt("HIGH_SCORE",0)) }
+    // basic Feature// var highscore by remember { mutableStateOf(prefs.getInt("HIGH_SCORE",0)) }
+    var highscore by remember { mutableStateOf(0) }
     var showDialog by remember { mutableStateOf(false) }
     var molehit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(userId){
+        CoroutineScope(Dispatchers.IO).launch {
+            val best = scoreDao.getPersonalBest(userId)?:0
+            withContext(Dispatchers.Main){
+                highscore = best
+            }
+        }
+    }
+
     LaunchedEffect(isRunning) {
         if(isRunning){
             launch {
@@ -65,11 +79,25 @@ fun GameScreen(navController: NavController){
                     timeLeft--
                 }
                 isRunning=false
-                if (score >highscore){
+/*                if (score >highscore){
                     highscore = score
                     prefs.edit { putInt("HIGH_SCORE", highscore) }
+                }*/
+                CoroutineScope(Dispatchers.IO).launch {
+                    scoreDao.insertScore(
+                        ScoreEntity(
+                            userId = userId,
+                            score = score,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                    val best = scoreDao.getPersonalBest(userId)?:0
+                    withContext(Dispatchers.Main){
+                        highscore = best
+                        showDialog = true
+                    }
                 }
-                showDialog = true
+
             }
         }
         launch {
